@@ -10,7 +10,6 @@ use crate::*;
 use crate::properties::*;
 
 
-/*
 pub trait Parent {
     type Element: Element<Parent=Self>;
 }
@@ -20,7 +19,6 @@ pub trait Element: Clone + PartialEq {
     
     fn parent(&self) -> Self::Parent;
 }
-*/
 
 /// A magma is an algebraic structure which consists of a set equipped with a 
 /// binary operation, ∘, which must be closed.
@@ -31,15 +29,14 @@ pub trait Element: Clone + PartialEq {
 /// a, b ∈ Self ⇒ a ∘ b ∈ Self
 /// ~~~
 pub trait Magma<O: Operator>: 
-    //Parent<Element=<Self as Magma<O>>::Element> 
+    Parent<Element=<Self as Magma<O>>::Element> 
 {
     type Element: MagmaElement<O, Parent=Self>;
     fn is_magma(&self, _: O) -> bool { true }
 }
 
 pub trait MagmaElement<O: Operator>:
-    Clone + PartialEq
-    //Element<Parent=<Self as MagmaElement<O>>::Parent> 
+    Element<Parent=<Self as MagmaElement<O>>::Parent> 
 {
     type Parent: Magma<O, Element=Self>;
 
