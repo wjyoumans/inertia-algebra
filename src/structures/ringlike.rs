@@ -20,8 +20,35 @@ pub trait DualMagmaElement<A: Operator = Additive, M: Operator = Multiplicative>
 {
     type Parent: DualMagma<A, M, Element=Self>;
 }
+
+impl<T, A, M> DualMagma<A, M> for T
+where
+    A: Operator,
+    M: Operator,
+    T: Parent,
+    + Magma<A, Element=<T as Parent>::Element>
+    + Magma<M, Element=<T as Parent>::Element>,
+    <T as Parent>::Element: MagmaElement<A, Parent=T>
+    + MagmaElement<M, Parent=T>
+{
+    type Element = <T as Parent>::Element;
+}
+
+impl<T, A, M> DualMagmaElement<A, M> for T
+where
+    A: Operator,
+    M: Operator,
+    T: Element,
+    //+ MagmaElement<A, Parent=<T as Element>::Parent>
+    //+ MagmaElement<M, Parent=<T as Element>::Parent>,
+    <T as Element>::Parent: Magma<A, Element=T>
+    + Magma<M, Element=T>
+{
+    type Parent = <T as Element>::Parent;
+}
 */
 
+/*
 /// A **ring** is the combination of an Abelian group and a multiplicative monoid 
 /// structure.
 ///
@@ -64,7 +91,9 @@ pub trait NCRingElement<A: Operator = Additive, M: Operator = Multiplicative>:
 {
     type Parent: NCRing<A, M, Element=Self>;
 }
+*/
 
+/*
 impl<T, A, M> NCRing<A, M> for T
 where
     A: Operator,
@@ -73,7 +102,9 @@ where
     + GroupAbelian<A, Element=<T as Parent>::Element>
     + Monoid<M, Element=<T as Parent>::Element>,
     //+ Distributive<A, M>,
-    <T as Parent>::Element: NCRingElement<A, M, Parent=T>
+    //<T as Parent>::Element: NCRingElement<A, M, Parent=T>
+    <T as Parent>::Element: GroupAbelianElement<A, Parent=T>
+    + MonoidElement<M, Parent=T>
 {
     type Element = <T as Parent>::Element;
 }
@@ -85,10 +116,14 @@ where
     T: Element
     + GroupAbelianElement<A, Parent=<T as Element>::Parent>
     + MonoidElement<M, Parent=<T as Element>::Parent>,
-    <T as Element>::Parent: NCRing<A, M, Element=Self>
+    //<T as Element>::Parent: NCRing<A, M, Element=Self>
+    <T as Element>::Parent: GroupAbelian<A, Element=T>
+    + Monoid<M, Element=T>
+
 {
     type Parent = <T as Element>::Parent;
 }
+*/
 
 /*
 pub trait NCRing<A: Operator = Additive, M: Operator = Multiplicative>:
