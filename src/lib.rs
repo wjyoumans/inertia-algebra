@@ -34,7 +34,7 @@ pub use operator::*;
 //#[macro_use]
 //mod macros;
 mod operator;
-mod ops;
+pub mod ops;
 pub mod properties;
 pub mod structures;
 

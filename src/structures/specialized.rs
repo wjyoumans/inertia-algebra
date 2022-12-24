@@ -1,7 +1,7 @@
 
 
 pub use grouplike::*;
-//pub use ringlike::*;
+pub use ringlike::*;
 
 mod grouplike;
-//mod ringlike;
+mod ringlike;

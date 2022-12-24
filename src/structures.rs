@@ -164,4 +164,4 @@ mod grouplike;
 mod ringlike;
 //mod modulelike;
 
-pub mod withops;
+pub mod specialized;
