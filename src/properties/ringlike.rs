@@ -1,28 +1,17 @@
 
 use crate::*;
-use crate::wrapper::Wrapper as W;
-use crate::structures::*;
+//use crate::wrapper::Wrapper as W;
+//use crate::structures::*;
 
-use approx::RelativeEq;
+//use approx::RelativeEq;
 
-/*
-type DualMagmaElem<T, A, M> = <T as DualMagma<A, M>>::Element;
-
-type DualMagmaElem3<T, A, M> = (
-    <T as DualMagma<A, M>>::Element,
-    <T as DualMagma<A, M>>::Element,
-    <T as DualMagma<A, M>>::Element
-);
-*/
-//type Elem<T> = <T as Parent>::Element;
-
-pub trait Distributive<A: Operator = Additive, M: Operator = Multiplicative>: {//Parent {
-    /*
+pub trait Distributive<A: Operator = Additive, M: Operator = Multiplicative>
+{
+    /* FIXME - get distributive props working again
     /// Returns `true` if the multiplication and addition operators are distributive 
     /// for the given argument tuple. Approximate equality is used for verifications.
     fn prop_mul_and_add_are_distributive_approx(
         args: (Elem<Self>, Elem<Self>, Elem<Self>)
-        //args: DualMagmaElem3<Self, A, M>
     ) -> bool
     where
         Elem<Self>: RelativeEq + Sized,
@@ -39,6 +28,7 @@ pub trait Distributive<A: Operator = Additive, M: Operator = Multiplicative>: {/
         relative_eq!((b() + c()) * a(), b() * a() + c() * a())
     }
     */
+
     /*
     /// Returns `true` if the multiplication and addition operators are distributive 
     /// for the given argument tuple.

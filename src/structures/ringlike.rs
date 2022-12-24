@@ -2,53 +2,6 @@ use crate::*;
 use crate::structures::*;
 use crate::properties::*;
 
-/*
-// needed to avoid cycle with NCRing: Distributive, Distributive: NCRing
-pub trait DualMagma<A: Operator = Additive, M: Operator = Multiplicative>:
-    Parent<Element=<Self as DualMagma<A, M>>::Element>
-    + Magma<A, Element=<Self as DualMagma<A, M>>::Element> 
-    + Magma<M, Element=<Self as DualMagma<A, M>>::Element> 
-{
-    type Element: DualMagmaElement<A, M, Parent=Self>;
-    fn is_dualmagma(&self) -> bool { true }
-}
-
-pub trait DualMagmaElement<A: Operator = Additive, M: Operator = Multiplicative>:
-    Element<Parent=<Self as DualMagmaElement<A, M>>::Parent>
-    + MagmaElement<A, Parent=<Self as DualMagmaElement<A, M>>::Parent> 
-    + MagmaElement<M, Parent=<Self as DualMagmaElement<A, M>>::Parent> 
-{
-    type Parent: DualMagma<A, M, Element=Self>;
-}
-
-impl<T, A, M> DualMagma<A, M> for T
-where
-    A: Operator,
-    M: Operator,
-    T: Parent,
-    + Magma<A, Element=<T as Parent>::Element>
-    + Magma<M, Element=<T as Parent>::Element>,
-    <T as Parent>::Element: MagmaElement<A, Parent=T>
-    + MagmaElement<M, Parent=T>
-{
-    type Element = <T as Parent>::Element;
-}
-
-impl<T, A, M> DualMagmaElement<A, M> for T
-where
-    A: Operator,
-    M: Operator,
-    T: Element,
-    //+ MagmaElement<A, Parent=<T as Element>::Parent>
-    //+ MagmaElement<M, Parent=<T as Element>::Parent>,
-    <T as Element>::Parent: Magma<A, Element=T>
-    + Magma<M, Element=T>
-{
-    type Parent = <T as Element>::Parent;
-}
-*/
-
-/*
 /// A **ring** is the combination of an Abelian group and a multiplicative monoid 
 /// structure.
 ///
@@ -73,106 +26,43 @@ where
 /// a, b, c ∈ Self, a × (b + c) = a × b + a × c.
 /// ~~~
 pub trait NCRing<A: Operator = Additive, M: Operator = Multiplicative>:
-    Parent<Element=<Self as NCRing<A, M>>::Element>
-    //DualMagma<Element=<Self as NCRing<A, M>>::Element>
-    + GroupAbelian<A, Element=<Self as NCRing<A, M>>::Element> 
+    GroupAbelian<A, Element=<Self as NCRing<A, M>>::Element> 
     + Monoid<M, Element=<Self as NCRing<A, M>>::Element>
-    //+ Distributive<A, M>
+    + Distributive<A, M>
 {
     type Element: NCRingElement<A, M, Parent=Self>;
-    fn is_ncring(&self) -> bool { true }
+    fn is_ncring(&self, _: A, _: M) -> bool { true }
 }
 
 pub trait NCRingElement<A: Operator = Additive, M: Operator = Multiplicative>:
-    Element<Parent=<Self as NCRingElement<A, M>>::Parent>
-    //DualMagmaElement<Parent=<Self as NCRingElement<A, M>>::Parent>
-    + GroupAbelianElement<A, Parent=<Self as NCRingElement<A, M>>::Parent> 
-    + MonoidElement<M, Parent=<Self as NCRingElement<A, M>>::Parent>
-{
-    type Parent: NCRing<A, M, Element=Self>;
-}
-*/
-
-/*
-impl<T, A, M> NCRing<A, M> for T
-where
-    A: Operator,
-    M: Operator,
-    T: Parent
-    + GroupAbelian<A, Element=<T as Parent>::Element>
-    + Monoid<M, Element=<T as Parent>::Element>,
-    //+ Distributive<A, M>,
-    //<T as Parent>::Element: NCRingElement<A, M, Parent=T>
-    <T as Parent>::Element: GroupAbelianElement<A, Parent=T>
-    + MonoidElement<M, Parent=T>
-{
-    type Element = <T as Parent>::Element;
-}
-
-impl<T, A, M> NCRingElement<A, M> for T
-where
-    A: Operator,
-    M: Operator,
-    T: Element
-    + GroupAbelianElement<A, Parent=<T as Element>::Parent>
-    + MonoidElement<M, Parent=<T as Element>::Parent>,
-    //<T as Element>::Parent: NCRing<A, M, Element=Self>
-    <T as Element>::Parent: GroupAbelian<A, Element=T>
-    + Monoid<M, Element=T>
-
-{
-    type Parent = <T as Element>::Parent;
-}
-*/
-
-/*
-pub trait NCRing<A: Operator = Additive, M: Operator = Multiplicative>:
-    DualMagma<A, M, Element=<Self as NCRing<A, M>>::Element>
-    + GroupAbelian<A, Element=<Self as NCRing<A, M>>::Element> 
-    + Monoid<M, Element=<Self as NCRing<A, M>>::Element>
-    //+ Distributive<A, M>
-{
-    type Element: NCRingElement<A, M, Parent=Self>;
-    fn is_ncring(&self) -> bool { true }
-}
-
-pub trait NCRingElement<A: Operator = Additive, M: Operator = Multiplicative>:
-    DualMagmaElement<A, M, Parent=<Self as NCRingElement<A, M>>::Parent>
-    + GroupAbelianElement<A, Parent=<Self as NCRingElement<A, M>>::Parent> 
+    GroupAbelianElement<A, Parent=<Self as NCRingElement<A, M>>::Parent> 
     + MonoidElement<M, Parent=<Self as NCRingElement<A, M>>::Parent>
 {
     type Parent: NCRing<A, M, Element=Self>;
 }
 
-impl<T, A, M> NCRing<A, M> for T
+impl<Par, Elem, A: Operator, M: Operator> NCRing<A, M> for Par
 where
-    A: Operator,
-    M: Operator,
-    T: DualMagma<A, M> 
-    + GroupAbelian<A, Element=<T as DualMagma<A, M>>::Element>
-    + Monoid<M, Element=<T as DualMagma<A, M>>::Element>,
-    //+ Distributive<A, M>,
-    <T as DualMagma<A, M>>::Element: TwoSidedInverse<A> 
-    + IsIdentity<A>
-    + IsIdentity<M>
+    Par: GroupAbelian<A, Element=Elem>
+    + Monoid<M, Element=Elem>
+    + Distributive<A, M>,
+    Elem: GroupAbelianElement<A, Parent=Par>
+    + MonoidElement<M, Parent=Par>
 {
-    type Element = <T as DualMagma<A, M>>::Element;
+    type Element = Elem;
 }
 
-impl<T, A, M> NCRingElement<A, M> for T
+impl<Par, Elem, A: Operator, M: Operator> NCRingElement<A, M> for Elem
 where
-    A: Operator,
-    M: Operator,
-    T: DualMagmaElement<A, M> 
-    + GroupAbelianElement<A, Parent=<T as DualMagmaElement<A, M>>::Parent>
-    + MonoidElement<M, Parent=<T as DualMagmaElement<A, M>>::Parent>,
-    <T as DualMagmaElement<A, M>>::Parent: NCRing<A, M, Element=Self>
+    Elem: GroupAbelianElement<A, Parent=Par>
+    + MonoidElement<M, Parent=Par>,
+    Par: GroupAbelian<A, Element=Elem>
+    + Monoid<M, Element=Elem>
+    + Distributive<A, M>
 {
-    type Parent = <T as DualMagmaElement<A, M>>::Parent;
+    type Parent = Par;
 }
-*/
 
-/*
 /// A ring with a commutative multiplication.
 ///
 /// *A **commutative ring** is a set with two binary operations: a closed commutative and associative with the divisibility property and an identity element,
@@ -188,7 +78,7 @@ pub trait Ring<A: Operator = Additive, M: Operator = Multiplicative>:
     + Commutative<M>
 {
     type Element: RingElement<A, M, Parent=Self>;
-    fn is_ring(&self) -> bool { true }
+    fn is_ring(&self, _: A, _: M) -> bool { true }
 }
 
 pub trait RingElement<A: Operator = Additive, M: Operator = Multiplicative>:
@@ -196,42 +86,22 @@ pub trait RingElement<A: Operator = Additive, M: Operator = Multiplicative>:
 {
     type Parent: Ring<A, M, Element=Self>;
 }
-impl<T, A, M> Ring<A, M> for T
+
+impl<Par, Elem, A: Operator, M: Operator> Ring<A, M> for Par
 where
-    A: Operator,
-    M: Operator,
-    T: NCRing<A, M> 
-    + Commutative<M>,
-    //<T as NCRing<A, M>>::Element: RingElement<A, M, Parent=Self>
+    Par: NCRing<A, M, Element=Elem> + Commutative<M>,
+    Elem: NCRingElement<A, M, Parent=Par>
 {
-    type Element = <T as DualMagma<A, M>>::Element;
+    type Element = Elem;
 }
 
-impl<T, A, M> RingElement<A, M> for T
+impl<Par, Elem, A: Operator, M: Operator> RingElement<A, M> for Elem
 where
-    A: Operator,
-    M: Operator,
-    T: NCRingElement<A, M>,
-    <T as NCRingElement<A, M>>::Parent: Ring<A, M, Element=Self>
+    Elem: NCRingElement<A, M, Parent=Par>,
+    Par: NCRing<A, M, Element=Elem> + Commutative<M>
 {
-    type Parent = <T as DualMagmaElement<A, M>>::Parent;
+    type Parent = Par;
 }
-
-/*
-pub trait Ring<A: Operator = Additive, M: Operator = Multiplicative>:
-    NCRing<A, M, Element=<Self as Ring<A, M>>::Element>
-    + Commutative<M>
-{
-    type Element: RingElement<A, M, Parent=Self>;
-    fn is_ring(&self) -> bool { true }
-}
-
-pub trait RingElement<A: Operator = Additive, M: Operator = Multiplicative>:
-    NCRingElement<A, M, Parent=<Self as RingElement<A, M>>::Parent>
-{
-    type Parent: Ring<A, M, Element=Self>;
-}
-*/
 
 /// A field is a commutative ring, and an Abelian group under both operators.
 ///
@@ -243,7 +113,7 @@ pub trait Field<A: Operator = Additive, M: Operator = Multiplicative>:
     + Divisible<M>
 {
     type Element: FieldElement<A, M, Parent=Self>;
-    fn is_field(&self) -> bool { true }
+    fn is_field(&self, _: A, _: M) -> bool { true }
 }
 
 pub trait FieldElement<A: Operator = Additive, M: Operator = Multiplicative>:
@@ -253,26 +123,22 @@ pub trait FieldElement<A: Operator = Additive, M: Operator = Multiplicative>:
     type Parent: Field<A, M, Element=Self>;
 }
 
-impl<T, A, M> Field<A, M> for T
+impl<Par, Elem, A: Operator, M: Operator> Field<A, M> for Par
 where
-    A: Operator,
-    M: Operator,
-    T: Ring<A, M> 
+    Par: Ring<A, M, Element=Elem> 
     + Divisible<M>,
-    <T as Ring<A, M>>::Element: TwoSidedInverse<M>
-    //<T as Ring<A, M>>::Element: FieldElement<A, M, Parent=Self>
+    Elem: RingElement<A, M, Parent=Par> 
+    + TwoSidedInverse<M>
 {
-    type Element = <T as DualMagma<A, M>>::Element;
+    type Element = Elem;
 }
 
-impl<T, A, M> FieldElement<A, M> for T
+impl<Par, Elem, A: Operator, M: Operator> FieldElement<A, M> for Elem
 where
-    A: Operator,
-    M: Operator,
-    T: RingElement<A, M>
+    Elem: RingElement<A, M, Parent=Par> 
     + TwoSidedInverse<M>,
-    <T as RingElement<A, M>>::Parent: Field<A, M, Element=Self>
+    Par: Ring<A, M, Element=Elem>
+    + Divisible<M>
 {
-    type Parent = <T as DualMagmaElement<A, M>>::Parent;
+    type Parent = Par;
 }
-*/

@@ -23,13 +23,21 @@ pub struct Wrap<T>(T);
 
 macro_rules! impl_wrapping {
     ($($t:ident)*) => ($(
-        impl Magma<Additive> for WrappingRing<$t> {
+
+        impl Parent for WrappingRing<$t> {
             type Element = Wrap<$t>;
         }
-
-        impl MagmaElement<Additive> for Wrap<$t> {
+        
+        impl Element for Wrap<$t> {
             type Parent = WrappingRing<$t>;
+            fn parent(&self) -> Self::Parent {
+                WrappingRing::init()
+            }
+        }
 
+        // Additive properties
+
+        impl Operation<Additive> for Wrap<$t> {
             fn operate(&self, right: &Self) -> Self {
                 Wrap(self.0.wrapping_add(right.0))
             }
@@ -59,13 +67,9 @@ macro_rules! impl_wrapping {
         
         impl Commutative<Additive> for WrappingRing<$t> {}
         
-        impl Magma<Multiplicative> for WrappingRing<$t> {
-            type Element = Wrap<$t>;
-        }
-        
-        impl MagmaElement<Multiplicative> for Wrap<$t> {
-            type Parent = WrappingRing<$t>;
+        // Multiplicative properties
 
+        impl Operation<Multiplicative> for Wrap<$t> {
             fn operate(&self, right: &Self) -> Self {
                 Wrap(self.0.wrapping_mul(right.0))
             }
@@ -86,14 +90,8 @@ macro_rules! impl_wrapping {
         impl Associative<Multiplicative> for WrappingRing<$t> {}
         
         impl Commutative<Multiplicative> for WrappingRing<$t> {}
-
-        impl DualMagma for WrappingRing<$t> {
-            type Element = Wrap<$t>;
-        }
-
-        impl DualMagmaElement for Wrap<$t> {
-            type Parent = WrappingRing<$t>;
-        }
+       
+        // Ring-like properties
 
         impl Distributive for WrappingRing<$t> {}
     )*);
@@ -114,9 +112,8 @@ fn main() {
     assert!(zn.is_magma(Multiplicative));
     assert!(zn.is_semigroup(Multiplicative));
     
-    assert!(zn.is_dualmagma());
-    assert!(zn.is_ncring());
-    assert!(zn.is_ring());
+    assert!(zn.is_ncring(Additive, Multiplicative));
+    assert!(zn.is_ring(Additive, Multiplicative));
 
     // not defined since no multiplicative inverses
     //assert!(zn.is_quasigroup(Multiplicative));
@@ -126,7 +123,11 @@ fn main() {
     //assert!(zn.is_field());
 
     let x = zn.new(-20);
+    println!("x = {}", -20);
+
     let y = zn.new(25);
+    println!("y = {}", 25);
+    
     let z = x.op(Multiplicative, &y);
-    println!("x*y = {}", z.0);
+    println!("x*y mod 2^8 = {}", z.0);
 }

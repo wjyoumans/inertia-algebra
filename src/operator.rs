@@ -8,6 +8,15 @@ pub trait Operator: Copy {
     fn operator_token() -> Self;
 }
 
+pub trait Operation<O: Operator>: Sized {
+    fn operate(&self, rhs: &Self) -> Self;
+
+    #[inline]
+    fn op(&self, _: O, rhs: &Self) -> Self {
+        self.operate(rhs)
+    }
+}
+
 /// Trait used to define the two_sided_inverse element relative to the given operator.
 ///
 /// The operator, e.g., `Additive` or `Multiplicative`, is identified by the type parameter `O`.

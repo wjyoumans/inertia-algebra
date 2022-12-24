@@ -1,14 +1,16 @@
 
-//! TODO: 
-//! * expand on why we have parent/element structure (see Parent doc)
-//! * explain use of A: Magma<Element=<Self as A>::Element>
-//! * explain A::Parent: Element<Parent=Self> (same idea)
-//! * comment on blanket impls
-//! * move comments describing properties to docs in properties.rs
+// TODO: 
+// * expand on why we have parent/element structure (see Parent doc)
+// * explain use of A: Magma<Element=<Self as A>::Element>
+// * explain A::Parent: Element<Parent=Self> (same idea)
+// * comment on blanket impls
+// * move comments describing properties to docs in properties.rs
 
 use crate::*;
 use crate::properties::*;
 
+pub type Elem<T> = <T as Parent>::Element;
+pub type Par<T> = <T as Element>::Parent;
 
 pub trait Parent {
     type Element: Element<Parent=Self>;
@@ -36,18 +38,25 @@ pub trait Magma<O: Operator>:
 }
 
 pub trait MagmaElement<O: Operator>:
-    Element<Parent=<Self as MagmaElement<O>>::Parent> 
+    Element<Parent=<Self as MagmaElement<O>>::Parent>
+    + Operation<O>
 {
     type Parent: Magma<O, Element=Self>;
+}
 
-    /// Performs an operation.
-    fn operate(&self, right: &Self) -> Self;
+impl<T, O: Operator> Magma<O> for T
+where
+    T: Parent,
+    Elem<T>: Operation<O>
+{
+    type Element = Elem<T>;
+}
 
-    /// Performs specific operation.
-    #[inline]
-    fn op(&self, _: O, lhs: &Self) -> Self {
-        self.operate(lhs)
-    }
+impl<T, O: Operator> MagmaElement<O> for T
+where
+    T: Element + Operation<O>
+{
+    type Parent = Par<T>;
 }
 
 /// A quasigroup is a magma which that has the **divisibility property** (or Latin 
@@ -84,24 +93,20 @@ pub trait QuasigroupElement<O: Operator>:
     type Parent: Quasigroup<O, Element=Self>;
 }
 
-impl<T, O> Quasigroup<O> for T
+impl<T, O: Operator> Quasigroup<O> for T
 where
-    O: Operator,
-    T: Magma<O> 
-    + Divisible<O>,
-    <T as Magma<O>>::Element: TwoSidedInverse<O>
+    T: Magma<O> + Divisible<O>,
+    Elem<T>: TwoSidedInverse<O>
 {
-    type Element = <T as Magma<O>>::Element;
+    type Element = Elem<T>;
 }
 
-impl<T, O> QuasigroupElement<O> for T
+impl<T, O: Operator> QuasigroupElement<O> for T
 where
-    O: Operator,
-    T: MagmaElement<O>
-    + TwoSidedInverse<O>,
-    <T as MagmaElement<O>>::Parent: Quasigroup<O, Element=Self>
+    T: MagmaElement<O> + TwoSidedInverse<O>,
+    Par<T>: Divisible<O>
 {
-    type Parent = <T as MagmaElement<O>>::Parent;
+    type Parent = Par<T>;
 }
 
 /// A semigroup is a quasigroup that is **associative**.
@@ -127,22 +132,19 @@ pub trait SemigroupElement<O: Operator>:
     type Parent: Semigroup<O, Element=Self>;
 }
 
-impl<T, O> Semigroup<O> for T
+impl<T, O: Operator> Semigroup<O> for T
 where
-    O: Operator,
-    T: Magma<O> 
-    + Associative<O>,
+    T: Magma<O> + Associative<O>,
 {
-    type Element = <T as Magma<O>>::Element;
+    type Element = Elem<T>;
 }
 
-impl<T, O> SemigroupElement<O> for T
+impl<T, O: Operator> SemigroupElement<O> for T
 where
-    O: Operator,
     T: MagmaElement<O>,
-    <T as MagmaElement<O>>::Parent: Semigroup<O, Element=Self>
+    Par<T>: Associative<O>
 {
-    type Parent = <T as MagmaElement<O>>::Parent;
+    type Parent = Par<T>;
 }
 
 /// A loop is a quasigroup with an unique **identity element**, e.
@@ -179,24 +181,20 @@ pub trait LoopElement<O: Operator>:
 
 }
 
-impl<T, O> Loop<O> for T
+impl<T, O: Operator> Loop<O> for T
 where
-    O: Operator,
-    T: Quasigroup<O> 
-    + Identity<O>,
-    <T as Quasigroup<O>>::Element: IsIdentity<O>
+    T: Quasigroup<O> + Identity<O>,
+    Elem<T>: IsIdentity<O>
 {
-    type Element = <T as Magma<O>>::Element;
+    type Element = Elem<T>;
 }
 
-impl<T, O> LoopElement<O> for T
+impl<T, O: Operator> LoopElement<O> for T
 where
-    O: Operator,
-    T: QuasigroupElement<O>
-    + IsIdentity<O>,
-    <T as QuasigroupElement<O>>::Parent: Loop<O, Element=Self>
+    T: QuasigroupElement<O> + IsIdentity<O>,
+    Par<T>: Identity<O>
 {
-    type Parent = <T as MagmaElement<O>>::Parent;
+    type Parent = Par<T>;
 }
 
 /// A monoid is a semigroup equipped with an identity element, e.
@@ -224,25 +222,20 @@ pub trait MonoidElement<O: Operator>:
     type Parent: Monoid<O, Element=Self>;
 }
 
-impl<T, O> Monoid<O> for T
+impl<T, O: Operator> Monoid<O> for T
 where
-    O: Operator,
-    T: Semigroup<O> 
-    + Identity<O>,
-    <T as Semigroup<O>>::Element: IsIdentity<O>
-    //<T as Semigroup<O>>::Element: MonoidElement<O, Parent=Self>
+    T: Semigroup<O> + Identity<O>,
+    Elem<T>: IsIdentity<O>
 {
-    type Element = <T as Magma<O>>::Element;
+    type Element = Elem<T>;
 }
 
-impl<T, O> MonoidElement<O> for T
+impl<T, O: Operator> MonoidElement<O> for T
 where
-    O: Operator,
-    T: SemigroupElement<O>
-    + IsIdentity<O>,
-    <T as SemigroupElement<O>>::Parent: Monoid<O, Element=Self>
+    T: SemigroupElement<O> + IsIdentity<O>,
+    Par<T>: Identity<O>
 {
-    type Parent = <T as MagmaElement<O>>::Parent;
+    type Parent = Par<T>;
 }
 
 /// A group is a loop and a monoid  at the same time.
@@ -262,23 +255,19 @@ pub trait GroupElement<O: Operator>:
     type Parent: Group<O, Element=Self>;
 }
 
-impl<T, O> Group<O> for T
+impl<T, O: Operator> Group<O> for T
 where
-    O: Operator,
-    T: Loop<O> 
-    + Associative<O>,
-    //<T as Loop<O>>::Element: GroupElement<O, Parent=Self>
+    T: Loop<O> + Associative<O>,
 {
-    type Element = <T as Magma<O>>::Element;
+    type Element = Elem<T>;
 }
 
-impl<T, O> GroupElement<O> for T
+impl<T, O: Operator> GroupElement<O> for T
 where
-    O: Operator,
     T: LoopElement<O>,
-    <T as LoopElement<O>>::Parent: Group<O, Element=Self>
+    Par<T>: Associative<O>
 {
-    type Parent = <T as MagmaElement<O>>::Parent;
+    type Parent = Par<T>;
 }
 
 /// An Abelian group is a **commutative** group.
@@ -304,24 +293,17 @@ pub trait GroupAbelianElement<O: Operator>:
     type Parent: GroupAbelian<O, Element=Self>;
 }
 
-impl<T, O> GroupAbelian<O> for T
+impl<T, O: Operator> GroupAbelian<O> for T
 where
-    O: Operator,
-    T: Group<O> 
-    + Commutative<O>,
-    //<T as Group<O>>::Element: GroupAbelianElement<O, Parent=Self>
+    T: Group<O> + Commutative<O>,
 {
-    type Element = <T as Magma<O>>::Element;
+    type Element = Elem<T>;
 }
 
-impl<T, O> GroupAbelianElement<O> for T
+impl<T, O: Operator> GroupAbelianElement<O> for T
 where
-    O: Operator,
     T: GroupElement<O>,
-    <T as GroupElement<O>>::Parent: GroupAbelian<O, Element=Self>
+    Par<T>: Commutative<O>
 {
-    type Parent = <T as MagmaElement<O>>::Parent;
+    type Parent = Par<T>;
 }
-
-// Implementations
-
