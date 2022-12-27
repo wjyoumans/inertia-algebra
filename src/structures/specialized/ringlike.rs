@@ -8,6 +8,11 @@ pub trait RingOps: AddOps
     + MulOps
 {}
 
+impl<T> RingOps for T
+where
+    T: AddOps + NegOps + SubOps + MulOps
+{}
+
 pub trait NCRing:
     AbstractNCRing<Element=<Self as NCRing>::Element>
 {

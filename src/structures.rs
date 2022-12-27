@@ -159,9 +159,9 @@
 pub use grouplike::*;
 pub use ringlike::*;
 //pub use modulelike::*;
+pub use specialized::*;
 
 mod grouplike;
 mod ringlike;
 //mod modulelike;
-
-pub mod specialized;
+mod specialized;

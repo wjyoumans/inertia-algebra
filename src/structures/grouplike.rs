@@ -1,18 +1,11 @@
 
-// TODO: 
-// * expand on why we have parent/element structure (see Parent doc)
-// * explain use of A: AbstractMagma<Element=<Self as A>::Element>
-// * explain A::Parent: Element<Parent=Self> (same idea)
-// * comment on blanket impls
-// * move comments describing properties to docs in properties.rs
-
 use crate::*;
 use crate::properties::*;
 
 pub type Elem<T> = <T as Parent>::Element;
 pub type Par<T> = <T as Element>::Parent;
 
-pub trait Parent {
+pub trait Parent: Clone {
     type Element: Element<Parent=Self>;
 }
 
