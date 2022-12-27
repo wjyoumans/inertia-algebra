@@ -99,7 +99,7 @@ impl<T: UlpsEq, A, M> UlpsEq for Wrapper<T, A, M> {
 
 impl<T, A: Operator, M> Add<Wrapper<T, A, M>> for Wrapper<T, A, M>
 where
-    T: MagmaElement<A>,
+    T: AbstractMagmaElement<A>,
 {
     type Output = Self;
 
@@ -111,7 +111,7 @@ where
 
 impl<T, A: Operator, M> Neg for Wrapper<T, A, M>
 where
-    T: QuasigroupElement<A>,
+    T: AbstractQuasigroupElement<A>,
 {
     type Output = Self;
 
@@ -124,7 +124,7 @@ where
 
 impl<T, A: Operator, M> Sub<Wrapper<T, A, M>> for Wrapper<T, A, M>
 where
-    T: QuasigroupElement<A>,
+    T: AbstractQuasigroupElement<A>,
 {
     type Output = Self;
 
@@ -136,7 +136,7 @@ where
 
 impl<T, A, M: Operator> Mul<Wrapper<T, A, M>> for Wrapper<T, A, M>
 where
-    T: MagmaElement<M>,
+    T: AbstractMagmaElement<M>,
 {
     type Output = Self;
 
@@ -148,7 +148,7 @@ where
 
 impl<T, A, M: Operator> TwoSidedInverse<M> for Wrapper<T, A, M>
 where
-    T: QuasigroupElement<M>,
+    T: AbstractQuasigroupElement<M>,
 {
     #[inline]
     fn two_sided_inverse(&self) -> Self {
@@ -158,7 +158,7 @@ where
 
 impl<T, A, M: Operator> Div<Wrapper<T, A, M>> for Wrapper<T, A, M>
 where
-    T: QuasigroupElement<M>,
+    T: AbstractQuasigroupElement<M>,
 {
     type Output = Self;
 

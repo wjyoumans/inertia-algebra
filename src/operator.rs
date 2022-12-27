@@ -1,6 +1,6 @@
 //! Operators traits and structures.
 
-use crate::structures::MagmaElement;
+use crate::structures::AbstractMagmaElement;
 
 /// Trait implemented by types representing abstract operators.
 pub trait Operator: Copy {
@@ -39,7 +39,7 @@ pub trait IsIdentity<O: Operator>: Sized {
     fn is_identity(&self) -> bool;
 }
 
-pub trait IsZero: MagmaElement<Additive> + IsIdentity<Additive> {
+pub trait IsZero: AbstractMagmaElement<Additive> + IsIdentity<Additive> {
     fn is_zero(&self) -> bool {
         self.is_identity()
     }
@@ -47,10 +47,10 @@ pub trait IsZero: MagmaElement<Additive> + IsIdentity<Additive> {
 
 impl<T> IsZero for T
 where
-    T: MagmaElement<Additive> + IsIdentity<Additive>
+    T: AbstractMagmaElement<Additive> + IsIdentity<Additive>
 {}
 
-pub trait IsOne: MagmaElement<Multiplicative> + IsIdentity<Multiplicative> {
+pub trait IsOne: AbstractMagmaElement<Multiplicative> + IsIdentity<Multiplicative> {
     fn is_one(&self) -> bool {
         self.is_identity()
     }
@@ -58,7 +58,7 @@ pub trait IsOne: MagmaElement<Multiplicative> + IsIdentity<Multiplicative> {
 
 impl<T> IsOne for T
 where
-    T: MagmaElement<Multiplicative> + IsIdentity<Multiplicative>
+    T: AbstractMagmaElement<Multiplicative> + IsIdentity<Multiplicative>
 {}
 
 /*

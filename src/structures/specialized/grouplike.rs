@@ -3,20 +3,54 @@ use crate::*;
 use crate::ops::*;
 use crate::structures::*;
 
+/* Do macro stuff
+macro_rules! specialize_structures(
+    // **With type parameters** for the trait being implemented.
+    (
+        $specialized_parent:ident, 
+        $specialized_element:ident, 
+        $abstract_parent_trait:ident<$($ops: ident),*> : $($bounds: ident)*
+        $abstract_element_trait:ident<$($ops: ident),*> : $($bounds: ident)*
+    ) => {
+        /// [Alias] Algebraic structure specialized for one kind of operation.
+        pub trait $specialized: $abstract_trait<$($ops),*> $(+ $bounds)* { }
+        impl<T: $abstract_trait<$($ops),*> $(+ $bounds)*> $specialized for T { }
+    };
+    // **Without type parameters** for the trait being implemented.
+    (
+        $specialized_parent:ident, 
+        $specialized_element:ident, 
+        $abstract_trait: ident : $($bounds: ident)*
+    ) => {
+        /// [Alias] Algebraic structure specialized for one kind of operation.
+        pub trait $specialized: $abstract_trait $(+ $bounds)* { }
+        impl<T: $abstract_trait $(+ $bounds)*> $specialized for T { }
+    }
+);
+
+specialize_structures! {
+    AdditiveMagma,
+    AbstractMagma<Additive>: 
+}
+specialize_structures! {
+    AdditiveQuasigroup, 
+    AbstractQuasigroup<Additive>: AdditiveMagma SubOps
+}
+*/
 
 // ADDITIVE
 
 // Magma
 
 pub trait AdditiveMagma:
-    Magma<Additive, Element=<Self as AdditiveMagma>::Element> 
+    AbstractMagma<Additive, Element=<Self as AdditiveMagma>::Element> 
 {
     type Element: AdditiveMagmaElement<Parent=Self>;
     fn is_additive_magma(&self) -> bool { true }
 }
 
 pub trait AdditiveMagmaElement:
-    MagmaElement<Additive, Parent=<Self as AdditiveMagmaElement>::Parent>
+    AbstractMagmaElement<Additive, Parent=<Self as AdditiveMagmaElement>::Parent>
     + AddOps
 {
     type Parent: AdditiveMagma<Element=Self>;
@@ -24,31 +58,31 @@ pub trait AdditiveMagmaElement:
 
 impl<T> AdditiveMagma for T
 where
-    T: Magma<Additive>,
-    <T as Magma<Additive>>::Element: AddOps
+    T: AbstractMagma<Additive>,
+    <T as AbstractMagma<Additive>>::Element: AddOps
 {
-    type Element = <Self as Magma<Additive>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> AdditiveMagmaElement for T
 where
-    T: MagmaElement<Additive>
+    T: AbstractMagmaElement<Additive>
     + AddOps
 {
-    type Parent = <Self as MagmaElement<Additive>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Quasigroup
 
 pub trait AdditiveQuasigroup: 
-    Quasigroup<Additive, Element=<Self as AdditiveQuasigroup>::Element>
+    AbstractQuasigroup<Additive, Element=<Self as AdditiveQuasigroup>::Element>
 {
     type Element: AdditiveQuasigroupElement<Parent=Self>;
     fn is_additive_quasigroup(&self) -> bool { true }
 }
 
 pub trait AdditiveQuasigroupElement:
-    QuasigroupElement<Additive, Parent=<Self as AdditiveQuasigroupElement>::Parent>
+    AbstractQuasigroupElement<Additive, Parent=<Self as AdditiveQuasigroupElement>::Parent>
     + NegOps
     + SubOps
 {
@@ -57,164 +91,164 @@ pub trait AdditiveQuasigroupElement:
 
 impl<T> AdditiveQuasigroup for T
 where
-    T: Quasigroup<Additive> ,
-    <T as Quasigroup<Additive>>::Element: NegOps + SubOps
+    T: AbstractQuasigroup<Additive>,
+    <T as AbstractQuasigroup<Additive>>::Element: NegOps + SubOps
 {
-    type Element = <T as Quasigroup<Additive>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> AdditiveQuasigroupElement for T
 where
-    T: QuasigroupElement<Additive>
+    T: AbstractQuasigroupElement<Additive>
     + NegOps
     + SubOps
 {
-    type Parent = <T as QuasigroupElement<Additive>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Semigroup
 
 pub trait AdditiveSemigroup: 
-    Semigroup<Additive, Element=<Self as AdditiveSemigroup>::Element>
+    AbstractSemigroup<Additive, Element=<Self as AdditiveSemigroup>::Element>
 {
     type Element: AdditiveSemigroupElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_additive_semigroup(&self) -> bool { true }
 }
 
 pub trait AdditiveSemigroupElement:
-    SemigroupElement<Additive, Parent=<Self as AdditiveSemigroupElement>::Parent>
+    AbstractSemigroupElement<Additive, Parent=<Self as AdditiveSemigroupElement>::Parent>
 {
     type Parent: AdditiveSemigroup<Element=Self>;
 }
 
 impl<T> AdditiveSemigroup for T
 where
-    T: Semigroup<Additive> 
+    T: AbstractSemigroup<Additive> 
 {
-    type Element = <T as Semigroup<Additive>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> AdditiveSemigroupElement for T
 where
-    T: SemigroupElement<Additive>
+    T: AbstractSemigroupElement<Additive>
 {
-    type Parent = <T as SemigroupElement<Additive>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Loop
 
 pub trait AdditiveLoop: 
-    Loop<Additive, Element=<Self as AdditiveLoop>::Element>
+    AbstractLoop<Additive, Element=<Self as AdditiveLoop>::Element>
 {
     type Element: AdditiveLoopElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_additive_loop(&self) -> bool { true }
 }
 
 pub trait AdditiveLoopElement:
-    LoopElement<Additive, Parent=<Self as AdditiveLoopElement>::Parent>
+    AbstractLoopElement<Additive, Parent=<Self as AdditiveLoopElement>::Parent>
 {
     type Parent: AdditiveLoop<Element=Self>;
 }
 
 impl<T> AdditiveLoop for T
 where
-    T: Loop<Additive> 
+    T: AbstractLoop<Additive> 
 {
-    type Element = <T as Loop<Additive>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> AdditiveLoopElement for T
 where
-    T: LoopElement<Additive>
+    T: AbstractLoopElement<Additive>
 {
-    type Parent = <T as LoopElement<Additive>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Monoid
 
 pub trait AdditiveMonoid: 
-    Monoid<Additive, Element=<Self as AdditiveMonoid>::Element>
+    AbstractMonoid<Additive, Element=<Self as AdditiveMonoid>::Element>
 {
     type Element: AdditiveMonoidElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_additive_monoid(&self) -> bool { true }
 }
 
 pub trait AdditiveMonoidElement:
-    MonoidElement<Additive, Parent=<Self as AdditiveMonoidElement>::Parent>
+    AbstractMonoidElement<Additive, Parent=<Self as AdditiveMonoidElement>::Parent>
 {
     type Parent: AdditiveMonoid<Element=Self>;
 }
 
 impl<T> AdditiveMonoid for T
 where
-    T: Monoid<Additive> 
+    T: AbstractMonoid<Additive> 
 {
-    type Element = <T as Monoid<Additive>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> AdditiveMonoidElement for T
 where
-    T: MonoidElement<Additive>
+    T: AbstractMonoidElement<Additive>
 {
-    type Parent = <T as MonoidElement<Additive>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Group
 
 pub trait AdditiveGroup: 
-    Group<Additive, Element=<Self as AdditiveGroup>::Element>
+    AbstractGroup<Additive, Element=<Self as AdditiveGroup>::Element>
 {
     type Element: AdditiveGroupElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_additive_group(&self) -> bool { true }
 }
 
 pub trait AdditiveGroupElement:
-    GroupElement<Additive, Parent=<Self as AdditiveGroupElement>::Parent>
+    AbstractGroupElement<Additive, Parent=<Self as AdditiveGroupElement>::Parent>
 {
     type Parent: AdditiveGroup<Element=Self>;
 }
 
 impl<T> AdditiveGroup for T
 where
-    T: Group<Additive> 
+    T: AbstractGroup<Additive> 
 {
-    type Element = <T as Group<Additive>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> AdditiveGroupElement for T
 where
-    T: GroupElement<Additive>
+    T: AbstractGroupElement<Additive>
 {
-    type Parent = <T as GroupElement<Additive>>::Parent;
+    type Parent = Par<T>;
 }
 
 // GroupAbelian
 
 pub trait AdditiveGroupAbelian: 
-    GroupAbelian<Additive, Element=<Self as AdditiveGroupAbelian>::Element>
+    AbstractGroupAbelian<Additive, Element=<Self as AdditiveGroupAbelian>::Element>
 {
     type Element: AdditiveGroupAbelianElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_additive_group_abelian(&self) -> bool { true }
 }
 
 pub trait AdditiveGroupAbelianElement:
-    GroupAbelianElement<Additive, Parent=<Self as AdditiveGroupAbelianElement>::Parent>
+    AbstractGroupAbelianElement<Additive, Parent=<Self as AdditiveGroupAbelianElement>::Parent>
 {
     type Parent: AdditiveGroupAbelian<Element=Self>;
 }
 
 impl<T> AdditiveGroupAbelian for T
 where
-    T: GroupAbelian<Additive> 
+    T: AbstractGroupAbelian<Additive> 
 {
-    type Element = <T as GroupAbelian<Additive>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> AdditiveGroupAbelianElement for T
 where
-    T: GroupAbelianElement<Additive>
+    T: AbstractGroupAbelianElement<Additive>
 {
-    type Parent = <T as GroupAbelianElement<Additive>>::Parent;
+    type Parent = Par<T>;
 }
 
 // MULTIPLICATIVE
@@ -222,14 +256,14 @@ where
 // Magma
 
 pub trait MultiplicativeMagma: 
-    Magma<Multiplicative, Element=<Self as MultiplicativeMagma>::Element> 
+    AbstractMagma<Multiplicative, Element=<Self as MultiplicativeMagma>::Element> 
 {
     type Element: MultiplicativeMagmaElement<Parent=Self>;
-    fn is_additive_magma(&self) -> bool { true }
+    fn is_multiplicative_magma(&self) -> bool { true }
 }
 
 pub trait MultiplicativeMagmaElement:
-    MagmaElement<Multiplicative, Parent=<Self as MultiplicativeMagmaElement>::Parent>
+    AbstractMagmaElement<Multiplicative, Parent=<Self as MultiplicativeMagmaElement>::Parent>
     + MulOps
 {
     type Parent: MultiplicativeMagma<Element=Self>;
@@ -237,31 +271,31 @@ pub trait MultiplicativeMagmaElement:
 
 impl<T> MultiplicativeMagma for T
 where
-    T: Magma<Multiplicative>,
-    <T as Magma<Multiplicative>>::Element: MulOps
+    T: AbstractMagma<Multiplicative>,
+    <T as AbstractMagma<Multiplicative>>::Element: MulOps
 {
-    type Element = <Self as Magma<Multiplicative>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> MultiplicativeMagmaElement for T
 where
-    T: MagmaElement<Multiplicative>
+    T: AbstractMagmaElement<Multiplicative>
     + MulOps
 {
-    type Parent = <Self as MagmaElement<Multiplicative>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Quasigroup
 
 pub trait MultiplicativeQuasigroup: 
-    Quasigroup<Multiplicative, Element=<Self as MultiplicativeQuasigroup>::Element>
+    AbstractQuasigroup<Multiplicative, Element=<Self as MultiplicativeQuasigroup>::Element>
 {
     type Element: MultiplicativeQuasigroupElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_multiplicative_quasigroup(&self) -> bool { true }
 }
 
 pub trait MultiplicativeQuasigroupElement:
-    QuasigroupElement<Multiplicative, Parent=<Self as MultiplicativeQuasigroupElement>::Parent>
+    AbstractQuasigroupElement<Multiplicative, Parent=<Self as MultiplicativeQuasigroupElement>::Parent>
     + DivOps + InvOps
 {
     type Parent: MultiplicativeQuasigroup<Element=Self>;
@@ -269,161 +303,161 @@ pub trait MultiplicativeQuasigroupElement:
 
 impl<T> MultiplicativeQuasigroup for T
 where
-    T: Quasigroup<Multiplicative>,
-    <T as Magma<Multiplicative>>::Element: DivOps + InvOps
+    T: AbstractQuasigroup<Multiplicative>,
+    <T as AbstractMagma<Multiplicative>>::Element: DivOps + InvOps
 {
-    type Element = <T as Quasigroup<Multiplicative>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> MultiplicativeQuasigroupElement for T
 where
-    T: QuasigroupElement<Multiplicative>
+    T: AbstractQuasigroupElement<Multiplicative>
     + DivOps + InvOps
 {
-    type Parent = <T as QuasigroupElement<Multiplicative>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Semigroup
 
 pub trait MultiplicativeSemigroup: 
-    Semigroup<Multiplicative, Element=<Self as MultiplicativeSemigroup>::Element>
+    AbstractSemigroup<Multiplicative, Element=<Self as MultiplicativeSemigroup>::Element>
 {
     type Element: MultiplicativeSemigroupElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_multiplicative_semigroup(&self) -> bool { true }
 }
 
 pub trait MultiplicativeSemigroupElement:
-    SemigroupElement<Multiplicative, Parent=<Self as MultiplicativeSemigroupElement>::Parent>
+    AbstractSemigroupElement<Multiplicative, Parent=<Self as MultiplicativeSemigroupElement>::Parent>
 {
     type Parent: MultiplicativeSemigroup<Element=Self>;
 }
 
 impl<T> MultiplicativeSemigroup for T
 where
-    T: Semigroup<Multiplicative> 
+    T: AbstractSemigroup<Multiplicative> 
 {
-    type Element = <T as Semigroup<Multiplicative>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> MultiplicativeSemigroupElement for T
 where
-    T: SemigroupElement<Multiplicative>
+    T: AbstractSemigroupElement<Multiplicative>
 {
-    type Parent = <T as SemigroupElement<Multiplicative>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Loop
 
 pub trait MultiplicativeLoop: 
-    Loop<Multiplicative, Element=<Self as MultiplicativeLoop>::Element>
+    AbstractLoop<Multiplicative, Element=<Self as MultiplicativeLoop>::Element>
 {
     type Element: MultiplicativeLoopElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_multiplicative_loop(&self) -> bool { true }
 }
 
 pub trait MultiplicativeLoopElement:
-    LoopElement<Multiplicative, Parent=<Self as MultiplicativeLoopElement>::Parent>
+    AbstractLoopElement<Multiplicative, Parent=<Self as MultiplicativeLoopElement>::Parent>
 {
     type Parent: MultiplicativeLoop<Element=Self>;
 }
 
 impl<T> MultiplicativeLoop for T
 where
-    T: Loop<Multiplicative> 
+    T: AbstractLoop<Multiplicative> 
 {
-    type Element = <T as Loop<Multiplicative>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> MultiplicativeLoopElement for T
 where
-    T: LoopElement<Multiplicative>
+    T: AbstractLoopElement<Multiplicative>
 {
-    type Parent = <T as LoopElement<Multiplicative>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Monoid
 
 pub trait MultiplicativeMonoid: 
-    Monoid<Multiplicative, Element=<Self as MultiplicativeMonoid>::Element>
+    AbstractMonoid<Multiplicative, Element=<Self as MultiplicativeMonoid>::Element>
 {
     type Element: MultiplicativeMonoidElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_multiplicative_monoid(&self) -> bool { true }
 }
 
 pub trait MultiplicativeMonoidElement:
-    MonoidElement<Multiplicative, Parent=<Self as MultiplicativeMonoidElement>::Parent>
+    AbstractMonoidElement<Multiplicative, Parent=<Self as MultiplicativeMonoidElement>::Parent>
 {
     type Parent: MultiplicativeMonoid<Element=Self>;
 }
 
 impl<T> MultiplicativeMonoid for T
 where
-    T: Monoid<Multiplicative> 
+    T: AbstractMonoid<Multiplicative> 
 {
-    type Element = <T as Monoid<Multiplicative>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> MultiplicativeMonoidElement for T
 where
-    T: MonoidElement<Multiplicative>
+    T: AbstractMonoidElement<Multiplicative>
 {
-    type Parent = <T as MonoidElement<Multiplicative>>::Parent;
+    type Parent = Par<T>;
 }
 
 // Group
 
 pub trait MultiplicativeGroup: 
-    Group<Multiplicative, Element=<Self as MultiplicativeGroup>::Element>
+    AbstractGroup<Multiplicative, Element=<Self as MultiplicativeGroup>::Element>
 {
     type Element: MultiplicativeGroupElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_multiplicative_group(&self) -> bool { true }
 }
 
 pub trait MultiplicativeGroupElement:
-    GroupElement<Multiplicative, Parent=<Self as MultiplicativeGroupElement>::Parent>
+    AbstractGroupElement<Multiplicative, Parent=<Self as MultiplicativeGroupElement>::Parent>
 {
     type Parent: MultiplicativeGroup<Element=Self>;
 }
 
 impl<T> MultiplicativeGroup for T
 where
-    T: Group<Multiplicative> 
+    T: AbstractGroup<Multiplicative> 
 {
-    type Element = <T as Group<Multiplicative>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> MultiplicativeGroupElement for T
 where
-    T: GroupElement<Multiplicative>
+    T: AbstractGroupElement<Multiplicative>
 {
-    type Parent = <T as GroupElement<Multiplicative>>::Parent;
+    type Parent = Par<T>;
 }
 
 // GroupAbelian
 
 pub trait MultiplicativeGroupAbelian: 
-    GroupAbelian<Multiplicative, Element=<Self as MultiplicativeGroupAbelian>::Element>
+    AbstractGroupAbelian<Multiplicative, Element=<Self as MultiplicativeGroupAbelian>::Element>
 {
     type Element: MultiplicativeGroupAbelianElement<Parent=Self>;
-    fn is_additive_quasigroup(&self) -> bool { true }
+    fn is_multiplicative_group_abelian(&self) -> bool { true }
 }
 
 pub trait MultiplicativeGroupAbelianElement:
-    GroupAbelianElement<Multiplicative, Parent=<Self as MultiplicativeGroupAbelianElement>::Parent>
+    AbstractGroupAbelianElement<Multiplicative, Parent=<Self as MultiplicativeGroupAbelianElement>::Parent>
 {
     type Parent: MultiplicativeGroupAbelian<Element=Self>;
 }
 
 impl<T> MultiplicativeGroupAbelian for T
 where
-    T: GroupAbelian<Multiplicative> 
+    T: AbstractGroupAbelian<Multiplicative> 
 {
-    type Element = <T as GroupAbelian<Multiplicative>>::Element;
+    type Element = Elem<T>;
 }
 
 impl<T> MultiplicativeGroupAbelianElement for T
 where
-    T: GroupAbelianElement<Multiplicative>
+    T: AbstractGroupAbelianElement<Multiplicative>
 {
-    type Parent = <T as GroupAbelianElement<Multiplicative>>::Parent;
+    type Parent = Par<T>;
 }

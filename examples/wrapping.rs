@@ -102,18 +102,21 @@ impl_wrapping! { usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 fn main() {
     let zn = WrappingRing::<i8>::init();
     
-    assert!(zn.is_magma(Additive));
-    assert!(zn.is_quasigroup(Additive));
-    assert!(zn.is_semigroup(Additive));
-    assert!(zn.is_loop(Additive));
-    assert!(zn.is_group(Additive));
-    assert!(zn.is_group_abelian(Additive));
+    assert!(zn.is_abstract_magma(Additive));
+    assert!(zn.is_abstract_quasigroup(Additive));
+    assert!(zn.is_abstract_semigroup(Additive));
+    assert!(zn.is_abstract_loop(Additive));
+    assert!(zn.is_abstract_group(Additive));
+    assert!(zn.is_abstract_group_abelian(Additive));
 
-    assert!(zn.is_magma(Multiplicative));
-    assert!(zn.is_semigroup(Multiplicative));
+    assert!(zn.is_abstract_magma(Multiplicative));
+    assert!(zn.is_abstract_semigroup(Multiplicative));
     
-    assert!(zn.is_ncring(Additive, Multiplicative));
-    assert!(zn.is_ring(Additive, Multiplicative));
+    assert!(zn.is_abstract_ncring(Additive, Multiplicative));
+    assert!(zn.is_abstract_ring(Additive, Multiplicative));
+    
+    //assert!(zn.is_ncring());
+    //assert!(zn.is_ring());
 
     // not defined since no multiplicative inverses
     //assert!(zn.is_quasigroup(Multiplicative));

@@ -25,39 +25,39 @@ use crate::properties::*;
 /// ~~~notrust
 /// a, b, c ∈ Self, a × (b + c) = a × b + a × c.
 /// ~~~
-pub trait NCRing<A: Operator = Additive, M: Operator = Multiplicative>:
-    GroupAbelian<A, Element=<Self as NCRing<A, M>>::Element> 
-    + Monoid<M, Element=<Self as NCRing<A, M>>::Element>
+pub trait AbstractNCRing<A: Operator = Additive, M: Operator = Multiplicative>:
+    AbstractGroupAbelian<A, Element=<Self as AbstractNCRing<A, M>>::Element> 
+    + AbstractMonoid<M, Element=<Self as AbstractNCRing<A, M>>::Element>
     + Distributive<A, M>
 {
-    type Element: NCRingElement<A, M, Parent=Self>;
-    fn is_ncring(&self, _: A, _: M) -> bool { true }
+    type Element: AbstractNCRingElement<A, M, Parent=Self>;
+    fn is_abstract_ncring(&self, _: A, _: M) -> bool { true }
 }
 
-pub trait NCRingElement<A: Operator = Additive, M: Operator = Multiplicative>:
-    GroupAbelianElement<A, Parent=<Self as NCRingElement<A, M>>::Parent> 
-    + MonoidElement<M, Parent=<Self as NCRingElement<A, M>>::Parent>
+pub trait AbstractNCRingElement<A: Operator = Additive, M: Operator = Multiplicative>:
+    AbstractGroupAbelianElement<A, Parent=<Self as AbstractNCRingElement<A, M>>::Parent> 
+    + AbstractMonoidElement<M, Parent=<Self as AbstractNCRingElement<A, M>>::Parent>
 {
-    type Parent: NCRing<A, M, Element=Self>;
+    type Parent: AbstractNCRing<A, M, Element=Self>;
 }
 
-impl<Par, Elem, A: Operator, M: Operator> NCRing<A, M> for Par
+impl<Par, Elem, A: Operator, M: Operator> AbstractNCRing<A, M> for Par
 where
-    Par: GroupAbelian<A, Element=Elem>
-    + Monoid<M, Element=Elem>
+    Par: AbstractGroupAbelian<A, Element=Elem>
+    + AbstractMonoid<M, Element=Elem>
     + Distributive<A, M>,
-    Elem: GroupAbelianElement<A, Parent=Par>
-    + MonoidElement<M, Parent=Par>
+    Elem: AbstractGroupAbelianElement<A, Parent=Par>
+    + AbstractMonoidElement<M, Parent=Par>
 {
     type Element = Elem;
 }
 
-impl<Par, Elem, A: Operator, M: Operator> NCRingElement<A, M> for Elem
+impl<Par, Elem, A: Operator, M: Operator> AbstractNCRingElement<A, M> for Elem
 where
-    Elem: GroupAbelianElement<A, Parent=Par>
-    + MonoidElement<M, Parent=Par>,
-    Par: GroupAbelian<A, Element=Elem>
-    + Monoid<M, Element=Elem>
+    Elem: AbstractGroupAbelianElement<A, Parent=Par>
+    + AbstractMonoidElement<M, Parent=Par>,
+    Par: AbstractGroupAbelian<A, Element=Elem>
+    + AbstractMonoid<M, Element=Elem>
     + Distributive<A, M>
 {
     type Parent = Par;
@@ -73,32 +73,32 @@ where
 /// ```notrust
 /// ∀ a, b ∈ Self, a × b = b × a
 /// ```
-pub trait Ring<A: Operator = Additive, M: Operator = Multiplicative>:
-    NCRing<A, M, Element=<Self as Ring<A, M>>::Element>
+pub trait AbstractRing<A: Operator = Additive, M: Operator = Multiplicative>:
+    AbstractNCRing<A, M, Element=<Self as AbstractRing<A, M>>::Element>
     + Commutative<M>
 {
-    type Element: RingElement<A, M, Parent=Self>;
-    fn is_ring(&self, _: A, _: M) -> bool { true }
+    type Element: AbstractRingElement<A, M, Parent=Self>;
+    fn is_abstract_ring(&self, _: A, _: M) -> bool { true }
 }
 
-pub trait RingElement<A: Operator = Additive, M: Operator = Multiplicative>:
-    NCRingElement<A, M, Parent=<Self as RingElement<A, M>>::Parent>
+pub trait AbstractRingElement<A: Operator = Additive, M: Operator = Multiplicative>:
+    AbstractNCRingElement<A, M, Parent=<Self as AbstractRingElement<A, M>>::Parent>
 {
-    type Parent: Ring<A, M, Element=Self>;
+    type Parent: AbstractRing<A, M, Element=Self>;
 }
 
-impl<Par, Elem, A: Operator, M: Operator> Ring<A, M> for Par
+impl<Par, Elem, A: Operator, M: Operator> AbstractRing<A, M> for Par
 where
-    Par: NCRing<A, M, Element=Elem> + Commutative<M>,
-    Elem: NCRingElement<A, M, Parent=Par>
+    Par: AbstractNCRing<A, M, Element=Elem> + Commutative<M>,
+    Elem: AbstractNCRingElement<A, M, Parent=Par>
 {
     type Element = Elem;
 }
 
-impl<Par, Elem, A: Operator, M: Operator> RingElement<A, M> for Elem
+impl<Par, Elem, A: Operator, M: Operator> AbstractRingElement<A, M> for Elem
 where
-    Elem: NCRingElement<A, M, Parent=Par>,
-    Par: NCRing<A, M, Element=Elem> + Commutative<M>
+    Elem: AbstractNCRingElement<A, M, Parent=Par>,
+    Par: AbstractNCRing<A, M, Element=Elem> + Commutative<M>
 {
     type Parent = Par;
 }
@@ -108,36 +108,36 @@ where
 /// *A **field** is a set with two binary operations, an addition and a multiplication, which are both closed, commutative, associative
 /// possess the divisibility property and an identity element, noted 0 and 1 respectively. Furthermore the multiplication is distributive
 /// over the addition.*
-pub trait Field<A: Operator = Additive, M: Operator = Multiplicative>:
-    Ring<A, M, Element=<Self as Field<A, M>>::Element>
+pub trait AbstractField<A: Operator = Additive, M: Operator = Multiplicative>:
+    AbstractRing<A, M, Element=<Self as AbstractField<A, M>>::Element>
     + Divisible<M>
 {
-    type Element: FieldElement<A, M, Parent=Self>;
-    fn is_field(&self, _: A, _: M) -> bool { true }
+    type Element: AbstractFieldElement<A, M, Parent=Self>;
+    fn is_abstract_field(&self, _: A, _: M) -> bool { true }
 }
 
-pub trait FieldElement<A: Operator = Additive, M: Operator = Multiplicative>:
-    RingElement<A, M, Parent=<Self as FieldElement<A, M>>::Parent> 
+pub trait AbstractFieldElement<A: Operator = Additive, M: Operator = Multiplicative>:
+    AbstractRingElement<A, M, Parent=<Self as AbstractFieldElement<A, M>>::Parent> 
     + TwoSidedInverse<M>
 {
-    type Parent: Field<A, M, Element=Self>;
+    type Parent: AbstractField<A, M, Element=Self>;
 }
 
-impl<Par, Elem, A: Operator, M: Operator> Field<A, M> for Par
+impl<Par, Elem, A: Operator, M: Operator> AbstractField<A, M> for Par
 where
-    Par: Ring<A, M, Element=Elem> 
+    Par: AbstractRing<A, M, Element=Elem> 
     + Divisible<M>,
-    Elem: RingElement<A, M, Parent=Par> 
+    Elem: AbstractRingElement<A, M, Parent=Par> 
     + TwoSidedInverse<M>
 {
     type Element = Elem;
 }
 
-impl<Par, Elem, A: Operator, M: Operator> FieldElement<A, M> for Elem
+impl<Par, Elem, A: Operator, M: Operator> AbstractFieldElement<A, M> for Elem
 where
-    Elem: RingElement<A, M, Parent=Par> 
+    Elem: AbstractRingElement<A, M, Parent=Par> 
     + TwoSidedInverse<M>,
-    Par: Ring<A, M, Element=Elem>
+    Par: AbstractRing<A, M, Element=Elem>
     + Divisible<M>
 {
     type Parent = Par;

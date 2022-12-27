@@ -4,6 +4,7 @@ use crate::structures::*;
 
 use approx::RelativeEq;
 
+/*
 type MagmaElem<T, O> = <T as Magma<O>>::Element;
 
 type MagmaElem2<T, O> = (
@@ -16,15 +17,16 @@ type MagmaElem3<T, O> = (
     <T as Magma<O>>::Element,
     <T as Magma<O>>::Element
 );
+*/
 
 /// A type that is equipped with identity.
-pub trait Identity<O: Operator>: Magma<O> {
+pub trait Identity<O: Operator>: AbstractMagma<O> {
     /// The identity element.
-    fn identity(&self) -> MagmaElem<Self, O>;
+    fn identity(&self) -> Elem<Self>;
 
     /// Specific identity.
     #[inline]
-    fn id(&self, _: O) -> MagmaElem<Self, O>
+    fn id(&self, _: O) -> Elem<Self>
     {
         self.identity()
     }
@@ -33,10 +35,10 @@ pub trait Identity<O: Operator>: Magma<O> {
     /// argument. Approximate equality is used for verifications.
     fn prop_operating_identity_element_is_noop_approx(
         &self, 
-        args: (MagmaElem<Self, O>,)
+        args: (Elem<Self>,)
     ) -> bool
     where
-        MagmaElem<Self, O>: RelativeEq,
+        Elem<Self>: RelativeEq,
     {
         let (a,) = args;
         relative_eq!(a.operate(&self.identity()), a)
@@ -47,54 +49,54 @@ pub trait Identity<O: Operator>: Magma<O> {
     /// argument.
     fn prop_operating_identity_element_is_noop(
         &self, 
-        args: (MagmaElem<Self, O>,)
+        args: (Elem<Self>,)
     ) -> bool
     where
-        MagmaElem<Self, O>: Eq,
+        Elem<Self>: Eq,
     {
         let (a,) = args;
         a.operate(&self.identity()) == a && self.identity().operate(&a) == a
     }
 }
 
-pub trait Zero: Magma<Additive> + Identity<Additive> {
-    fn zero(&self) -> <Self as Magma<Additive>>::Element {
+pub trait Zero: AbstractMagma<Additive> + Identity<Additive> {
+    fn zero(&self) -> Elem<Self> {
         self.identity()
     }
 }
 
 impl<T> Zero for T
 where
-    T: Magma<Additive> + Identity<Additive>
+    T: AbstractMagma<Additive> + Identity<Additive>
 {}
 
-pub trait One: Magma<Multiplicative> + Identity<Multiplicative> {
-    fn one(&self) -> <Self as Magma<Multiplicative>>::Element {
+pub trait One: AbstractMagma<Multiplicative> + Identity<Multiplicative> {
+    fn one(&self) -> Elem<Self> {
         self.identity()
     }
 }
 
 impl<T> One for T
 where
-    T: Magma<Multiplicative> + Identity<Multiplicative>
+    T: AbstractMagma<Multiplicative> + Identity<Multiplicative>
 {}
 
 
-pub trait Associative<O: Operator>: Magma<O> { 
+pub trait Associative<O: Operator>: AbstractMagma<O> { 
     /// Returns `true` if associativity holds for the given arguments. Approximate 
     /// equality is used for verifications.
-    fn prop_is_associative_approx(args: MagmaElem3<Self, O>) -> bool
+    fn prop_is_associative_approx(args: (Elem<Self>, Elem<Self>, Elem<Self>)) -> bool
     where
-        MagmaElem<Self, O>: RelativeEq,
+        Elem<Self>: RelativeEq,
     {
         let (a, b, c) = args;
         relative_eq!(a.operate(&b).operate(&c), a.operate(&b.operate(&c)))
     }
 
     /// Returns `true` if associativity holds for the given arguments.
-    fn prop_is_associative(args: MagmaElem3<Self, O>) -> bool
+    fn prop_is_associative(args: (Elem<Self>, Elem<Self>, Elem<Self>)) -> bool
     where
-        MagmaElem<Self, O>: Eq,
+        Elem<Self>: Eq,
     {
         let (a, b, c) = args;
         a.operate(&b).operate(&c) == a.operate(&b.operate(&c))
@@ -103,9 +105,9 @@ pub trait Associative<O: Operator>: Magma<O> {
 
 
 pub trait Divisible<O: Operator>: 
-    Magma<O>
+    AbstractMagma<O>
 where
-    MagmaElem<Self, O>: TwoSidedInverse<O>
+    Elem<Self>: TwoSidedInverse<O>
 {
     /// Returns `true` if latin squareness holds for the given arguments. Approximate
     /// equality is used for verifications.
@@ -113,9 +115,9 @@ where
     /// ```notrust
     /// a ~= a / b ∘ b && a ~= a ∘ b / b
     /// ```
-    fn prop_inv_is_latin_square_approx(args: MagmaElem2<Self, O>) -> bool
+    fn prop_inv_is_latin_square_approx(args: (Elem<Self>, Elem<Self>)) -> bool
     where
-        MagmaElem<Self, O>: RelativeEq,
+        Elem<Self>: RelativeEq,
     {
         let (a, b) = args;
         relative_eq!(a, a.operate(&b.two_sided_inverse()).operate(&b))
@@ -129,9 +131,9 @@ where
     /// ```notrust
     /// a == a / b * b && a == a * b / b
     /// ```
-    fn prop_inv_is_latin_square(args: MagmaElem2<Self, O>) -> bool
+    fn prop_inv_is_latin_square(args: (Elem<Self>, Elem<Self>)) -> bool
     where
-        MagmaElem<Self, O>: Eq,
+        Elem<Self>: Eq,
     {
         let (a, b) = args;
         a == a.operate(&b.two_sided_inverse()).operate(&b)
@@ -141,21 +143,21 @@ where
     }
 }
 
-pub trait Commutative<O: Operator>: Magma<O> {
+pub trait Commutative<O: Operator>: AbstractMagma<O> {
     /// Returns `true` if the operator is commutative for the given argument tuple. 
     /// Approximate equality is used for verifications.
-    fn prop_is_commutative_approx(args: MagmaElem2<Self, O>) -> bool
+    fn prop_is_commutative_approx(args: (Elem<Self>, Elem<Self>)) -> bool
     where
-        MagmaElem<Self, O>: RelativeEq
+        Elem<Self>: RelativeEq
     {
         let (a, b) = args;
         relative_eq!(a.operate(&b), b.operate(&a))
     }
 
     /// Returns `true` if the operator is commutative for the given argument tuple.
-    fn prop_is_commutative(args: MagmaElem2<Self, O>) -> bool
+    fn prop_is_commutative(args: (Elem<Self>, Elem<Self>)) -> bool
     where
-        MagmaElem<Self, O>: Eq
+        Elem<Self>: Eq
     {
         let (a, b) = args;
         a.operate(&b) == b.operate(&a)
