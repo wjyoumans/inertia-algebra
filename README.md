@@ -26,6 +26,15 @@ TODO:
  * better/more concise version of above explanations
  * comment on blanket impls
  * move comments describing properties to docs in properties.rs
- * give Operation methods for each possible op, with all derived from few but 
-   overloadable. Then use macros for deriving std::ops (+ From/Assign ops) 
+ * fix Distributive property
+ * better names for methods in property traits
+ * move Identity/One/Zero/TwoSidedInverse to properties
+ * rework inverse + quasigroup, refine properties
+ * move traits from inertia-generic here. (New, PolynomialRing, etc.)
+
+MAYBE:
+ * add subset stuff back?
+ * give Operation trait methods for each possible op, with most derived from few and 
+   overloadable. Then use macros for deriving std::ops (+ From/Assign ops).
+
 -->
