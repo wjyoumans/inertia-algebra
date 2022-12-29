@@ -12,8 +12,9 @@ edition = "2021"
 
 
 [features]
-default = [ "std" ]
-std = [ ]
+default = ["std", "structures"]
+std = []
+structures = []
 
 [dependencies]
 approx      = { version = "0.3", default-features = false }

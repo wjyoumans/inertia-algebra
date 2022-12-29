@@ -1,6 +1,7 @@
 // re-export std::ops
 pub use std::ops::*;
 
+// move to structures::ops?
 
 pub trait NegOps:
     //Neg<Output=Self>

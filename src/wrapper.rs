@@ -8,7 +8,6 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 
 use crate::*;
-use crate::structures::*;
 
 /// Wrapper that allows to use operators on algebraic types.
 #[derive(Debug)]

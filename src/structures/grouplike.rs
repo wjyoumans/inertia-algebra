@@ -1,6 +1,5 @@
 
 use crate::*;
-use crate::properties::*;
 
 pub type Elem<T> = <T as Parent>::Element;
 pub type Par<T> = <T as Element>::Parent;

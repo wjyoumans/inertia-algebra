@@ -23,20 +23,31 @@
 */
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[allow(unused_imports)]
 #[macro_use]
 extern crate approx;
 
 #[cfg(not(feature = "std"))]
 extern crate core as std;
 
+pub mod ops;
+
+#[cfg(feature = "structures")]
+pub mod operator;
+#[cfg(feature = "structures")]
 pub use operator::*;
 
-//#[macro_use]
-//mod macros;
-mod operator;
-pub mod ops;
+#[cfg(feature = "structures")]
 pub mod properties;
+#[cfg(feature = "structures")]
+pub use properties::*;
+
+#[cfg(feature = "structures")]
 pub mod structures;
+#[cfg(feature = "structures")]
+pub use structures::*;
 
 #[doc(hidden)]
+#[cfg(feature = "structures")]
 pub mod wrapper;
+

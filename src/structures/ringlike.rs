@@ -1,6 +1,4 @@
 use crate::*;
-use crate::structures::*;
-use crate::properties::*;
 
 /// A **ring** is the combination of an Abelian group and a multiplicative monoid 
 /// structure.
