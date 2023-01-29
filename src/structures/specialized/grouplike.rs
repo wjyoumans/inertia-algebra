@@ -42,6 +42,10 @@ specialize_structures! {
 
 // Magma
 
+pub trait AddMagmaOps: AddOps {}
+
+impl<T> AddMagmaOps for T where T: AddOps {}
+
 pub trait AdditiveMagma:
     AbstractMagma<Additive, Element=<Self as AdditiveMagma>::Element> 
 {
@@ -51,7 +55,7 @@ pub trait AdditiveMagma:
 
 pub trait AdditiveMagmaElement:
     AbstractMagmaElement<Additive, Parent=<Self as AdditiveMagmaElement>::Parent>
-    + AddOps
+    + AddMagmaOps
 {
     type Parent: AdditiveMagma<Element=Self>;
 }
@@ -59,20 +63,23 @@ pub trait AdditiveMagmaElement:
 impl<T> AdditiveMagma for T
 where
     T: AbstractMagma<Additive>,
-    <T as AbstractMagma<Additive>>::Element: AddOps
+    <T as AbstractMagma<Additive>>::Element: AddMagmaOps
 {
     type Element = Elem<T>;
 }
 
 impl<T> AdditiveMagmaElement for T
 where
-    T: AbstractMagmaElement<Additive>
-    + AddOps
+    T: AbstractMagmaElement<Additive> + AddMagmaOps
 {
     type Parent = Par<T>;
 }
 
 // Quasigroup
+
+pub trait AddQuasigroupOps: AddOps + NegOps + SubOps {}
+
+impl<T> AddQuasigroupOps for T where T: AddOps + NegOps + SubOps {}
 
 pub trait AdditiveQuasigroup: 
     AbstractQuasigroup<Additive, Element=<Self as AdditiveQuasigroup>::Element>
@@ -83,8 +90,7 @@ pub trait AdditiveQuasigroup:
 
 pub trait AdditiveQuasigroupElement:
     AbstractQuasigroupElement<Additive, Parent=<Self as AdditiveQuasigroupElement>::Parent>
-    + NegOps
-    + SubOps
+    + AddQuasigroupOps
 {
     type Parent: AdditiveQuasigroup<Element=Self>;
 }
@@ -92,16 +98,14 @@ pub trait AdditiveQuasigroupElement:
 impl<T> AdditiveQuasigroup for T
 where
     T: AbstractQuasigroup<Additive>,
-    <T as AbstractQuasigroup<Additive>>::Element: NegOps + SubOps
+    <T as AbstractQuasigroup<Additive>>::Element: AddQuasigroupOps 
 {
     type Element = Elem<T>;
 }
 
 impl<T> AdditiveQuasigroupElement for T
 where
-    T: AbstractQuasigroupElement<Additive>
-    + NegOps
-    + SubOps
+    T: AbstractQuasigroupElement<Additive> + AddQuasigroupOps
 {
     type Parent = Par<T>;
 }
@@ -117,20 +121,22 @@ pub trait AdditiveSemigroup:
 
 pub trait AdditiveSemigroupElement:
     AbstractSemigroupElement<Additive, Parent=<Self as AdditiveSemigroupElement>::Parent>
+    + AddMagmaOps
 {
     type Parent: AdditiveSemigroup<Element=Self>;
 }
 
 impl<T> AdditiveSemigroup for T
 where
-    T: AbstractSemigroup<Additive> 
+    T: AbstractSemigroup<Additive>,
+    <T as AbstractSemigroup<Additive>>::Element: AddMagmaOps
 {
     type Element = Elem<T>;
 }
 
 impl<T> AdditiveSemigroupElement for T
 where
-    T: AbstractSemigroupElement<Additive>
+    T: AbstractSemigroupElement<Additive> + AddMagmaOps
 {
     type Parent = Par<T>;
 }
@@ -146,20 +152,22 @@ pub trait AdditiveLoop:
 
 pub trait AdditiveLoopElement:
     AbstractLoopElement<Additive, Parent=<Self as AdditiveLoopElement>::Parent>
+    + AddQuasigroupOps
 {
     type Parent: AdditiveLoop<Element=Self>;
 }
 
 impl<T> AdditiveLoop for T
 where
-    T: AbstractLoop<Additive> 
+    T: AbstractLoop<Additive>,
+    <T as AbstractLoop<Additive>>::Element: AddQuasigroupOps
 {
     type Element = Elem<T>;
 }
 
 impl<T> AdditiveLoopElement for T
 where
-    T: AbstractLoopElement<Additive>
+    T: AbstractLoopElement<Additive> + AddQuasigroupOps
 {
     type Parent = Par<T>;
 }
@@ -175,20 +183,22 @@ pub trait AdditiveMonoid:
 
 pub trait AdditiveMonoidElement:
     AbstractMonoidElement<Additive, Parent=<Self as AdditiveMonoidElement>::Parent>
+    + AddQuasigroupOps
 {
     type Parent: AdditiveMonoid<Element=Self>;
 }
 
 impl<T> AdditiveMonoid for T
 where
-    T: AbstractMonoid<Additive> 
+    T: AbstractMonoid<Additive>,
+    <T as AbstractMonoid<Additive>>::Element: AddQuasigroupOps
 {
     type Element = Elem<T>;
 }
 
 impl<T> AdditiveMonoidElement for T
 where
-    T: AbstractMonoidElement<Additive>
+    T: AbstractMonoidElement<Additive> + AddQuasigroupOps
 {
     type Parent = Par<T>;
 }
@@ -204,20 +214,22 @@ pub trait AdditiveGroup:
 
 pub trait AdditiveGroupElement:
     AbstractGroupElement<Additive, Parent=<Self as AdditiveGroupElement>::Parent>
+    + AddQuasigroupOps
 {
     type Parent: AdditiveGroup<Element=Self>;
 }
 
 impl<T> AdditiveGroup for T
 where
-    T: AbstractGroup<Additive> 
+    T: AbstractGroup<Additive>,
+    <T as AbstractGroup<Additive>>::Element: AddQuasigroupOps
 {
     type Element = Elem<T>;
 }
 
 impl<T> AdditiveGroupElement for T
 where
-    T: AbstractGroupElement<Additive>
+    T: AbstractGroupElement<Additive> + AddQuasigroupOps
 {
     type Parent = Par<T>;
 }
@@ -233,20 +245,22 @@ pub trait AdditiveGroupAbelian:
 
 pub trait AdditiveGroupAbelianElement:
     AbstractGroupAbelianElement<Additive, Parent=<Self as AdditiveGroupAbelianElement>::Parent>
+    + AddQuasigroupOps
 {
     type Parent: AdditiveGroupAbelian<Element=Self>;
 }
 
 impl<T> AdditiveGroupAbelian for T
 where
-    T: AbstractGroupAbelian<Additive> 
+    T: AbstractGroupAbelian<Additive>,
+    <T as AbstractGroupAbelian<Additive>>::Element: AddQuasigroupOps
 {
     type Element = Elem<T>;
 }
 
 impl<T> AdditiveGroupAbelianElement for T
 where
-    T: AbstractGroupAbelianElement<Additive>
+    T: AbstractGroupAbelianElement<Additive> + AddQuasigroupOps
 {
     type Parent = Par<T>;
 }

@@ -1,5 +1,6 @@
 // re-export std::ops
 pub use std::ops::*;
+use crate::Parent;
 
 // move to structures::ops?
 
@@ -85,6 +86,24 @@ where
 /// Assign to self. Not meant for expensive conversion.
 pub trait Assign<T = Self> {
     fn assign(&mut self, other: T);
+}
+
+// Constructors
+
+pub trait New<T> {
+    fn new(src: T) -> Self;
+}
+
+pub trait NewCtx<T, Ctx> {
+    fn new(src: T, ctx: &Ctx) -> Self;
+}
+
+pub trait NewMatrix<T> {
+    fn new(src: T, nrows: i64, ncols: i64) -> Self;
+}
+
+pub trait NewElement<T>: Parent {
+    fn new(&self, src: T) -> Self::Element;
 }
 
 ///////////////////////////////////////////////////////////////////
